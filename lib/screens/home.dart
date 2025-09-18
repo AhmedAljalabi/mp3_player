@@ -72,7 +72,7 @@ class _SongListScreenState extends State<SongListScreen> {
          leading: const Padding(
           padding: EdgeInsets.only(left: 16.0),
           child: CircleAvatar(
-            backgroundImage: AssetImage('assets/A (3).jpg'),
+            backgroundImage: AssetImage('assets/A (6).jpg'),
           ),
         ),
         title: const Column(

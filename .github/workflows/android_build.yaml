@@ -1,30 +1,27 @@
 name: Build Android APK
-
 on:
-push:
-branches:
-- main # The branch you want to build from
-
+  push:
+    branches:
+      - main # The branch you want to build from
 jobs:
-build:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v4
-- name: Set up Flutter
-uses: subosito/flutter-action@v2
-with:
-channel: 'stable' # <--- Add this line to specify the channel
-flutter-version: '3.35.1' # <--- Change this to a specific version, or '3.x'
-
-  - run: flutter pub get
-
-  - name: Patch on_audio_query_android build.gradle
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable' # <--- Add this line to specify the channel
+          flutter-version: '3.35.1' # <--- Change this to a specific version, or '3.x'
+      - run: flutter pub get
+      - name: Patch on_audio_query_android build.gradle
     run: |
       sed -i 's|android {|android {\n    namespace "com.on_audio_query_android"|' $HOME/.pub-cache/hosted/pub.dev/on_audio_query_android-1.1.0/android/build.gradle
 
-  - run: flutter build apk --release
+       - run: flutter build apk --release
 
-  - uses: actions/upload-artifact@v4
+       - uses: actions/upload-artifact@v4
     with:
       name: app-release
       path: build/app/outputs/flutter-apk/app-release.apk
+      

@@ -35,6 +35,17 @@ jobs:
           sed -i 's/package="com.lucasjosino.on_audio_query"//g' $MANIFEST
           echo "✅ Removed package attribute from $MANIFEST"
 
+      # 👇 Add JVM target = 17 to align Kotlin & Java
+      - name: Patch on_audio_query_android JVM target
+        run: |
+          FILE="$HOME/.pub-cache/hosted/pub.dev/on_audio_query_android-1.1.0/android/build.gradle"
+          if grep -q "kotlinOptions" $FILE; then
+            echo "✅ Kotlin options already set"
+          else
+            sed -i '/android {/a \    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n\n    kotlinOptions {\n        jvmTarget = "17"\n    }' $FILE
+            echo "✅ Added JVM target 17 to $FILE"
+          fi
+
       - name: Build APK
         run: flutter build apk --release
 

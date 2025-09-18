@@ -35,7 +35,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   Future<void> _initPlayer() async {
-    // Set up event listeners
     _positionSubscription = _audioPlayer.positionStream.listen((position) {
       setState(() => _position = position);
     });
@@ -49,7 +48,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
       });
     });
 
-    // Load the initial song
     await _loadSong(widget.songs[_currentIndex]);
   }
 
@@ -69,13 +67,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
-    
-    if (hours > 0) {
-      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
-    }
     return '${twoDigits(minutes)}:${twoDigits(seconds)}';
   }
 
@@ -92,63 +85,63 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final song = widget.songs[_currentIndex];
     
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Now Playing'),
+        title: const Text('Now Playing', style: TextStyle(color: Colors.white)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Album art
-            QueryArtworkWidget(
-              id: song.id,
-              type: ArtworkType.AUDIO,
-              size: 300,
-              nullArtworkWidget: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.music_note,
-                  size: 100,
-                  color: Colors.grey,
+            Expanded(
+              child: Center(
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    image: const DecorationImage(
+                      image: AssetImage('assets/A (3).jpg'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 32),
-            // Song title
+            const SizedBox(height: 30),
             Text(
               song.title,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            // Artist name
-            Text(
-              song.artist ?? 'Unknown Artist',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 32),
-            // Progress bar
+            const SizedBox(height: 8),
+            Text(
+              song.artist ?? 'Unknown Artist',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade400,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 30),
             Slider(
               value: _position.inSeconds.toDouble(),
               min: 0,
@@ -156,33 +149,68 @@ class _PlayerScreenState extends State<PlayerScreen> {
               onChanged: (value) {
                 _audioPlayer.seek(Duration(seconds: value.toInt()));
               },
+              activeColor: Colors.white,
+              inactiveColor: Colors.grey.shade700,
             ),
-            // Time indicators
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(_formatDuration(_position)),
-                  Text(_formatDuration(_duration)),
+                  Text(
+                    _formatDuration(_position),
+                    style: TextStyle(color: Colors.grey.shade400),
+                  ),
+                  Text(
+                    _formatDuration(_duration),
+                    style: TextStyle(color: Colors.grey.shade400),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            // Play/Pause button
-            IconButton(
-              icon: Icon(
-                _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                size: 64,
-              ),
-              onPressed: () async {
-                if (_isPlaying) {
-                  await _audioPlayer.pause();
-                } else {
-                  await _audioPlayer.play();
-                }
-              },
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.shuffle, color: Colors.white70, size: 28),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.skip_previous, color: Colors.white, size: 36),
+                  onPressed: () {},
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      _isPlaying ? Icons.pause : Icons.play_arrow,
+                      color: Colors.black,
+                      size: 36,
+                    ),
+                    onPressed: () async {
+                      if (_isPlaying) {
+                        await _audioPlayer.pause();
+                      } else {
+                        await _audioPlayer.play();
+                      }
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.skip_next, color: Colors.white, size: 36),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.repeat, color: Colors.white70, size: 28),
+                  onPressed: () {},
+                ),
+              ],
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

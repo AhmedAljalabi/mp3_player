@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -12,11 +11,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ahmed Player',
+      title: 'AJ Player',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
       ),
       home: const SongListScreen(),
     );

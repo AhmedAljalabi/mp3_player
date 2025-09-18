@@ -2,7 +2,7 @@ name: Build Android APK
 on:
   push:
     branches:
-      - main # The branch you want to build from
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +17,7 @@ jobs:
 
       - run: flutter pub get
 
-      # 👇 Patch step added here
+      # 👇 Patch namespace in build.gradle
       - name: Patch on_audio_query_android namespace
         run: |
           FILE="$HOME/.pub-cache/hosted/pub.dev/on_audio_query_android-1.1.0/android/build.gradle"
@@ -27,6 +27,13 @@ jobs:
             sed -i '/android {/a \    namespace "com.lucasjosino.on_audio_query_android"' $FILE
             echo "✅ Namespace added to $FILE"
           fi
+
+      # 👇 Remove package attribute from AndroidManifest.xml
+      - name: Patch on_audio_query_android manifest
+        run: |
+          MANIFEST="$HOME/.pub-cache/hosted/pub.dev/on_audio_query_android-1.1.0/android/src/main/AndroidManifest.xml"
+          sed -i 's/package="com.lucasjosino.on_audio_query"//g' $MANIFEST
+          echo "✅ Removed package attribute from $MANIFEST"
 
       - name: Build APK
         run: flutter build apk --release

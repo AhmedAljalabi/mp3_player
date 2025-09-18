@@ -8,13 +8,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # <--- Add this line to specify the channel
-          flutter-version: '3.35.1' # <--- Change this to a specific version, or '3.x'
+          channel: 'stable'
+          flutter-version: '3.35.1'
+
       - run: flutter pub get
-      - run: flutter build apk --release
+
+      # 👇 Patch step added here
+      - name: Patch on_audio_query_android namespace
+        run: |
+          FILE="$HOME/.pub-cache/hosted/pub.dev/on_audio_query_android-1.1.0/android/build.gradle"
+          if grep -q "namespace" $FILE; then
+            echo "✅ Namespace already exists"
+          else
+            sed -i '/android {/a \    namespace "com.lucasjosino.on_audio_query_android"' $FILE
+            echo "✅ Namespace added to $FILE"
+          fi
+
+      - name: Build APK
+        run: flutter build apk --release
+
       - uses: actions/upload-artifact@v4
         with:
           name: app-release

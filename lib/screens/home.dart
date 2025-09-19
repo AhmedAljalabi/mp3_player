@@ -164,7 +164,23 @@ class _SongListScreenState extends State<SongListScreen> {
       itemCount: _songs.length,
       itemBuilder: (context, index) {
         final song = _songs[index];
-        return Container(
+        return GestureDetector(
+           onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => PlayerScreen(
+                            songs: _songs,
+                             initialIndex: index,
+                
+                ),
+           
+              ),
+            );
+          },
+
+
+           child: Container(
+
           decoration: BoxDecoration(
             color: Colors.grey.shade800.withOpacity(.6),
             borderRadius: BorderRadius.circular(16),
@@ -177,7 +193,7 @@ class _SongListScreenState extends State<SongListScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   image: DecorationImage(
-                    image: const AssetImage('assets/placeholder.jpg'),
+                    image: const AssetImage('assets/A (3).jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -210,8 +226,9 @@ class _SongListScreenState extends State<SongListScreen> {
               IconButton(
                 icon: const Icon(Icons.favorite_border, color: Colors.white70, size: 20),
                 onPressed: () {},
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },

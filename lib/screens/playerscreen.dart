@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-import 'dart:async';  
-
+import 'dart:async';
 
 class PlayerScreen extends StatefulWidget {
   final List<SongModel> songs;
@@ -26,6 +26,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Duration _duration = Duration.zero;
   StreamSubscription? _positionSubscription;
   StreamSubscription? _stateSubscription;
+  Uint8List? _albumArt;
 
   @override
   void initState() {
@@ -40,11 +41,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
     });
     
     _stateSubscription = _audioPlayer.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        _playNext();
+      }
       setState(() {
         _isPlaying = state.playing;
-        if (state.processingState == ProcessingState.completed) {
-          _isPlaying = false;
-        }
       });
     });
 
@@ -53,15 +54,50 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Future<void> _loadSong(SongModel song) async {
     try {
-      await _audioPlayer.setAudioSource(
-        AudioSource.uri(Uri.parse(song.uri!)),
-      );
-      _duration = _audioPlayer.duration ?? Duration.zero;
-      setState(() {});
+      if (song.uri != null) {
+        final audioSource = AudioSource.uri(Uri.parse(song.uri!));
+        await _audioPlayer.setAudioSource(audioSource);
+        _duration = _audioPlayer.duration ?? Duration.zero;
+        await _audioPlayer.play();
+        _fetchAlbumArt(song.id);
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Song URI is null')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error loading song')),
+        SnackBar(content: Text('Error loading song: $e')),
       );
+    }
+  }
+
+  void _playNext() {
+    setState(() {
+      _currentIndex = (_currentIndex + 1) % widget.songs.length;
+    });
+    _loadSong(widget.songs[_currentIndex]);
+  }
+
+  void _playPrevious() {
+    setState(() {
+      _currentIndex = (_currentIndex - 1 + widget.songs.length) % widget.songs.length;
+    });
+    _loadSong(widget.songs[_currentIndex]);
+  }
+
+  Future<void> _fetchAlbumArt(int songId) async {
+    try {
+      final OnAudioQuery audioQuery = OnAudioQuery();
+      final art = await audioQuery.queryArtwork(songId, ArtworkType.AUDIO, size: 300);
+      setState(() {
+        _albumArt = art;
+      });
+    } catch (e) {
+      setState(() {
+        _albumArt = null;
+      });
     }
   }
 
@@ -88,6 +124,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Now Playing', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -110,8 +149,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   height: 300,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    image: const DecorationImage(
-                      image: AssetImage('assets/A (3).jpg'),
+                    image: DecorationImage(
+                      image: _albumArt != null
+                          ? MemoryImage(_albumArt!)
+                          : const AssetImage('assets/A (3).jpg') as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -178,7 +219,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_previous, color: Colors.white, size: 36),
-                  onPressed: () {},
+                  onPressed: _playPrevious,
                 ),
                 Container(
                   decoration: const BoxDecoration(
@@ -202,7 +243,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_next, color: Colors.white, size: 36),
-                  onPressed: () {},
+                  onPressed: _playNext,
                 ),
                 IconButton(
                   icon: const Icon(Icons.repeat, color: Colors.white70, size: 28),

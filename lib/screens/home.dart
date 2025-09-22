@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mp3_player/screens/playerscreen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:async';  
-
+import 'dart:async';
 
 class SongListScreen extends StatefulWidget {
   const SongListScreen({super.key});
@@ -29,11 +28,11 @@ class _SongListScreenState extends State<SongListScreen> {
     if (status != PermissionStatus.granted) {
       status = await Permission.mediaLibrary.request();
     }
-    
+
     setState(() {
       _hasPermission = status == PermissionStatus.granted;
     });
-    
+
     if (_hasPermission) {
       _fetchSongs();
     } else {
@@ -48,11 +47,14 @@ class _SongListScreenState extends State<SongListScreen> {
         orderType: OrderType.ASC_OR_SMALLER,
         ignoreCase: true,
       );
-      
-      songs = songs.where((song) => song.fileExtension == 'mp3' || 
-                                  song.fileExtension == 'm4a' || 
-                                  song.fileExtension == 'aac').toList();
-      
+
+      songs = songs
+          .where((song) =>
+              song.fileExtension == 'mp3' ||
+              song.fileExtension == 'm4a' ||
+              song.fileExtension == 'aac')
+          .toList();
+
       setState(() {
         _songs = songs;
         _isLoading = false;
@@ -66,25 +68,74 @@ class _SongListScreenState extends State<SongListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 16.0),
-          child: CircleAvatar(
-            backgroundImage: AssetImage('assets/A (6).jpg'),
-          ),
-        ),
-        title: const Column(
+        title: 
+        const Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Good Morning!", style: TextStyle(fontSize: 12, color: Colors.green)),
-            Text("Ahmed Aljalabi", style: TextStyle(fontSize: 16,color: Colors.blue, fontWeight: FontWeight.bold)),
+
+           CircleAvatar(
+            backgroundImage: AssetImage('assets/A (3).jpg'),
+            ),
+
+            Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+            Text("Welcome!",
+                style: TextStyle(fontSize: 18, color: Colors.green)
+                ),
+            Text("Ahmed Aljalabi",
+                style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)
+                ),
+             ],
+            ),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.white70),
-            onPressed: () {},
+            onPressed: () {
+                Navigator.pop(context); // This closes the drawer
+                Navigator.pushNamed(context, '/my_notification');
+
+            },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                image: DecorationImage(
+                  image: AssetImage('assets/A (6).jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Center(
+                child: Text('',
+                    style: TextStyle(color: Colors.black, fontSize: 24)),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite, color: Colors.red),
+              title: Text('Favorite Songs'),
+              onTap: () {
+                Navigator.pop(context); // This closes the drawer
+                Navigator.pushNamed(context, '/manage_favorites');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.equalizer, color: Colors.black),
+              title: Text('Equalizer'),
+              onTap: () {
+                Navigator.pop(context); // This closes the drawer
+                Navigator.pushNamed(context, '/equalizer');
+              },
+            ),
+          ],
+        ),
       ),
       body: _buildBody(),
       bottomNavigationBar: Container(
@@ -125,7 +176,7 @@ class _SongListScreenState extends State<SongListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Permission needed to access music files', 
+            const Text('Permission needed to access music files',
                 style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -140,19 +191,20 @@ class _SongListScreenState extends State<SongListScreen> {
         ),
       );
     }
-    
+
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)),
+        child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)),
       );
     }
-    
+
     if (_songs.isEmpty) {
       return const Center(
         child: Text('No songs found', style: TextStyle(color: Colors.white70)),
       );
     }
-    
+
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -165,67 +217,68 @@ class _SongListScreenState extends State<SongListScreen> {
       itemBuilder: (context, index) {
         final song = _songs[index];
         return GestureDetector(
-           onTap: () {
+          onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => PlayerScreen(
-                            songs: _songs,
-                             initialIndex: index,
-                
+                  songs: _songs,
+                  initialIndex: index,
                 ),
-           
               ),
             );
           },
-
-
-           child: Container(
-
-          decoration: BoxDecoration(
-            color: Colors.grey.shade800.withOpacity(.6),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.all(12),
-                height: 120,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    image: const AssetImage('assets/A (3).jpg'),
-                    fit: BoxFit.cover,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade800.withOpacity(.6),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(12),
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: QueryArtworkWidget(
+                    id: song.id,
+                    type: ArtworkType.AUDIO,
+                    artworkBorder: BorderRadius.circular(12),
+                    nullArtworkWidget: Image.asset(
+                      'placeholder.jpg',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  song.title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    song.title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  song.artist ?? 'Unknown Artist',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade400,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    song.artist ?? 'Unknown Artist',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade400,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.white70, size: 20),
-                onPressed: () {},
+                IconButton(
+                  icon: const Icon(Icons.favorite_border,
+                      color: Colors.white70, size: 20),
+                  onPressed: () {},
                 ),
               ],
             ),

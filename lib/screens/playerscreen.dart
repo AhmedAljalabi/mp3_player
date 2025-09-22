@@ -152,7 +152,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     image: DecorationImage(
                       image: _albumArt != null
                           ? MemoryImage(_albumArt!)
-                          : const AssetImage('assets/A (3).jpg') as ImageProvider,
+                          : const AssetImage('assets/placeholder.jpg') as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/home.dart';
+import 'screens/favorites.dart';
+import 'screens/equalizer.dart';
+import 'screens/my_notification.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +24,14 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Colors.white),
         ),
       ),
-      home: const SongListScreen(),
+       initialRoute: '/',
+        routes: {
+          '/': (context) => SongListScreen(),
+          '/manage_favorites': (context) => Favorites(),
+          '/equalizer': (context) => Equalizer(),
+          '/my_notification': (context) => My_Notification(),
+          
+        },
     );
   }
 }

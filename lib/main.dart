@@ -3,6 +3,8 @@ import 'screens/home.dart';
 import 'screens/favorites.dart';
 import 'screens/equalizer.dart';
 import 'screens/my_notification.dart';
+import 'screens/myinfo.dart';
+import 'screens/mysearch.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +32,8 @@ class MyApp extends StatelessWidget {
           '/manage_favorites': (context) => Favorites(),
           '/equalizer': (context) => Equalizer(),
           '/my_notification': (context) => My_Notification(),
+          '/my_search': (context) => My_Search(),
+          '/my_info': (context) => My_Info(),
           
         },
     );

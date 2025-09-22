@@ -92,7 +92,7 @@ class _SongListScreenState extends State<SongListScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white70),
+            icon: const Icon(Icons.notifications_none, color: Color.fromRGBO(255, 183, 77, 1)),
             onPressed: () {
                 Navigator.pop(context); // This closes the drawer
                 Navigator.pushNamed(context, '/my_notification');
@@ -118,6 +118,7 @@ class _SongListScreenState extends State<SongListScreen> {
                     style: TextStyle(color: Colors.black, fontSize: 24)),
               ),
             ),
+
             ListTile(
               leading: const Icon(Icons.favorite, color: Colors.red),
               title: Text('Favorite Songs'),
@@ -126,12 +127,30 @@ class _SongListScreenState extends State<SongListScreen> {
                 Navigator.pushNamed(context, '/manage_favorites');
               },
             ),
+
             ListTile(
               leading: Icon(Icons.equalizer, color: Colors.black),
               title: Text('Equalizer'),
               onTap: () {
                 Navigator.pop(context); // This closes the drawer
                 Navigator.pushNamed(context, '/equalizer');
+              },
+            ),
+
+            ListTile(
+              leading: Icon(Icons.notifications, color: Colors.orange[300]),
+              title: Text('Notifications'),
+              onTap: () {
+                Navigator.pop(context); // This closes the drawer
+                Navigator.pushNamed(context, '/my_notification');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person, color: Colors.blue),
+              title: Text('Information'),
+              onTap: () {
+                Navigator.pop(context); // This closes the drawer
+                Navigator.pushNamed(context, '/my_info');
               },
             ),
           ],
@@ -150,19 +169,28 @@ class _SongListScreenState extends State<SongListScreen> {
           children: [
             IconButton(
               icon: const Icon(Icons.home_filled, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/'); 
+              },
             ),
             IconButton(
               icon: const Icon(Icons.search, color: Colors.white70),
-              onPressed: () {},
+              onPressed: () {
+              Navigator.pushNamed(context, '/my_search');
+
+              },
             ),
             IconButton(
               icon: const Icon(Icons.favorite_border, color: Colors.white70),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/manage_favorites'); 
+              },
             ),
             IconButton(
               icon: const Icon(Icons.person_outline, color: Colors.white70),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/my_info');
+              },
             ),
           ],
         ),

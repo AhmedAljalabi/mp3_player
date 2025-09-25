@@ -3,6 +3,10 @@ import 'package:mp3_player/screens/playerscreen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
+import 'package:mp3_player/main.dart'; // Import main.dart to get audioHandler
+import 'package:audio_service/audio_service.dart';
+
+
 
 class SongListScreen extends StatefulWidget {
   const SongListScreen({super.key});
@@ -62,6 +66,31 @@ class _SongListScreenState extends State<SongListScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
     }
+  }
+
+  void _playSong(int index) {
+    // Create a list of MediaItem from your songs
+    final playlist = _songs.map((song) => MediaItem(
+      id: song.id.toString(),
+      title: song.title,
+      artist: song.artist ?? 'Unknown Artist',
+      duration: Duration(milliseconds: song.duration ?? 0),
+      extras: {'url': song.uri!},
+    )).toList();
+
+    // Update the queue and start playback
+    audioHandler.updateQueue(playlist);
+    audioHandler.skipToQueueItem(index);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlayerScreen(
+          songs: _songs,
+          initialIndex: index,
+        ),
+      ),
+    );
   }
 
   @override
@@ -245,16 +274,7 @@ class _SongListScreenState extends State<SongListScreen> {
       itemBuilder: (context, index) {
         final song = _songs[index];
         return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => PlayerScreen(
-                  songs: _songs,
-                  initialIndex: index,
-                ),
-              ),
-            );
-          },
+          onTap: () => _playSong(index),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.grey.shade800.withOpacity(.6),
